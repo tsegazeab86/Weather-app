@@ -1,11 +1,10 @@
-const API_KEY = 'b8b1c93c3732437bb6d182601261510'; // WeatherAPI Key
+const API_KEY = 'b8b1c93c3732437bb6d182601261510';  
 const BASE_URL = 'https://api.weatherapi.com/v1';
 
-let currentUnit = 'C'; // 'C' or 'F'
+let currentUnit = 'C';  
 let currentWeatherData = null;
 let map = null;
 
-// DOM Elements
 const loadingOverlay = document.getElementById('loadingOverlay');
 const weatherContent = document.getElementById('weatherContent');
 const errorAlert = document.getElementById('errorAlert');
@@ -30,7 +29,6 @@ function showLoader() {
   if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 }
 
-// Fetch Weather Data
 async function getWeatherByCity(city) {
   showLoader();
   if (errorAlert) errorAlert.classList.add('d-none');
@@ -63,7 +61,6 @@ async function getWeatherByCoords(lat, lon) {
   }
 }
 
-// Update UI
 function updateUI(data) {
   const current = data.current;
   const location = data.location;
@@ -71,7 +68,6 @@ function updateUI(data) {
 
   document.getElementById('cityName').textContent = `${location.name}, ${location.country}`;
   
-  // Dynamic Unit display
   const temp = currentUnit === 'C' ? Math.round(current.temp_c) : Math.round(current.temp_f);
   const feelsLike = currentUnit === 'C' ? Math.round(current.feelslike_c) : Math.round(current.feelslike_f);
   document.getElementById('tempValue').textContent = `${temp}°${currentUnit}`;
@@ -83,24 +79,19 @@ function updateUI(data) {
   document.getElementById('pressureVal').textContent = `${current.pressure_mb} hPa`;
   document.getElementById('visibilityVal').textContent = `${current.vis_km} km`;
 
-  // Sun Cycle
   if (forecastDays[0] && forecastDays[0].astro) {
     document.getElementById('sunriseVal').textContent = forecastDays[0].astro.sunrise;
     document.getElementById('sunsetVal').textContent = forecastDays[0].astro.sunset;
   }
 
-  // Date
   const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
   document.getElementById('weatherDate').textContent = new Date(location.localtime).toLocaleDateString('en-US', options);
 
-  // Icon
   const iconUrl = current.condition.icon.startsWith('//') ? `https:${current.condition.icon}` : current.condition.icon;
   document.getElementById('weatherIcon').src = iconUrl.replace('64x64', '128x128');
 
-  // Interactive Map Rendering
   renderMap(location.lat, location.lon, location.name);
 
-  // Theme
   const conditionText = current.condition.text.toLowerCase();
   document.body.className = '';
   if (conditionText.includes('sun') || conditionText.includes('clear')) document.body.classList.add('theme-clear');
@@ -115,7 +106,6 @@ function updateUI(data) {
   safeInitIcons();
 }
 
-// Leaflet Map Logic
 function renderMap(lat, lon, cityName) {
   if (!map) {
     map = L.map('weatherMap').setView([lat, lon], 10);
@@ -128,7 +118,6 @@ function renderMap(lat, lon, cityName) {
   L.marker([lat, lon]).addTo(map).bindPopup(cityName).openPopup();
 }
 
-// Forecast Rendering
 function renderForecast(forecastDays) {
   const forecastContainer = document.getElementById('forecastContainer');
   if (!forecastContainer) return;
@@ -152,7 +141,6 @@ function renderForecast(forecastDays) {
   });
 }
 
-// Favorites Feature (LocalStorage)
 function getFavorites() {
   return JSON.parse(localStorage.getItem('fav_cities') || '["Injibara", "Addis Ababa", "London"]');
 }
@@ -182,7 +170,6 @@ if (saveFavBtn) {
   });
 }
 
-// Unit Switchers
 unitCBtn.addEventListener('click', () => {
   if (currentUnit !== 'C') {
     currentUnit = 'C';
@@ -201,7 +188,6 @@ unitFBtn.addEventListener('click', () => {
   }
 });
 
-// Live Digital Clock
 function updateLiveClock() {
   const clockElement = document.getElementById('liveClockText');
   if (clockElement) {
@@ -211,7 +197,6 @@ function updateLiveClock() {
 }
 setInterval(updateLiveClock, 1000);
 
-// Search & Load Handlers
 if (searchBtn) {
   searchBtn.addEventListener('click', () => {
     const city = cityInput.value.trim();
